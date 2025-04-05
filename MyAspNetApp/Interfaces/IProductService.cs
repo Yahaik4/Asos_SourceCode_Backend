@@ -1,13 +1,15 @@
-// using MyAspNetApp.Entities;
+using MyAspNetApp.Entities;
 
-// namespace MyAspNetApp.Interfaces
-// {
-//     public interface IProductService
-//     {
-//         Task<IEnumerable<Product>> GetAllProduct();
-//         Task<IEnumerable<Product>> GetProductByCategory(string categoryName);
-//         Task<Product> CreateProduct(Product product);
-//         Task<Product> UpdateProduct(Product product);
-//         Task<bool> DeleteProduct(int Id);
-//     }
-// }
+namespace MyAspNetApp.Interfaces
+{
+    public interface IProductService
+    {
+        Task<IEnumerable<Product>> GetAllProduct();
+        Task<IEnumerable<Product>> GetProductByCategory(string categoryName);
+        Task<Product> CreateProduct(string type, ProductDto product);
+        Task<Product> UpdateProduct(ProductUpdateDto productDto);
+        Task<bool> DeleteProduct(int Id);
+        Task<IEnumerable<Product>> Filter(Filter filter);
+
+    }
+}

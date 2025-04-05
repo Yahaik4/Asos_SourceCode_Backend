@@ -6,6 +6,10 @@ namespace MyAspNetApp.Entities
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public List<Product> Products { get; set; } = new List<Product>();
+        public int ProductGroupId { get; set; }
+        // public List<ProductGroup> ProductGroups { get; set; }
+
+        public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+
     }
 }

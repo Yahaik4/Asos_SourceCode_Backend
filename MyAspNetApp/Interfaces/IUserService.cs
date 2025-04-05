@@ -11,5 +11,7 @@ namespace MyAspNetApp.Interfaces
         Task<string> Login(UserLoginDto userLoginDto, HttpContext httpContext);
         Task<bool> SignOut(HttpContext httpContext);
         Task<string> ResetPassword(UserResetPasswordDto userResetPasswordDto);
+        Task<string> VevifyOTP(UserVerifyOTPDto userVerifyOTPDto);
+        Task<int> GetUserId(HttpContext httpContext);
     }
 }

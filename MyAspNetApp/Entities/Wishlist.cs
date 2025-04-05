@@ -4,9 +4,8 @@ namespace MyAspNetApp.Entities
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public int ProductId { get; set; }
+        public User User{ get; set; }
+        public virtual ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>(); 
 
-        public User User { get; set; }
-        public Product Product { get; set; }
     }
 }

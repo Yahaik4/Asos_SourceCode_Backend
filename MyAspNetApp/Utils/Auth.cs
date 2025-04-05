@@ -54,5 +54,26 @@ namespace MyAspNetApp.Utils{
 
             httpContext.Response.Cookies.Append("token", Token, cookieOptions);
         }
+
+        public static string GetUserIdFromToken(HttpContext httpContext)
+        {
+            if (!httpContext.Request.Cookies.TryGetValue("token", out var token))
+            {
+                return null;
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            if (jwtToken == null)
+            {
+                return null; 
+            }
+
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
+
+            return userIdClaim?.Value;
+        }
+
     }
 }

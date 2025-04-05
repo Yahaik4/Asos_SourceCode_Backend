@@ -10,5 +10,6 @@ namespace MyAspNetApp.Interfaces
         Task<User?> FindUserByEmail(string Email);
         Task<User?> FindUserById(int Id);
 
+        Task<string> ChangePassword(string email);
     }
 }

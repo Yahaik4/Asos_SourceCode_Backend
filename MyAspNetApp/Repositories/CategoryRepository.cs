@@ -60,11 +60,18 @@ namespace MyAspNetApp.Repositories
             }
             
             existed.Name = category.Name;
+            existed.Description = category.Description;
+            existed.ProductGroupId = category.ProductGroupId;
             
             _context.Categories.Update(existed); 
             
             await _context.SaveChangesAsync();
             return existed;
+        }
+
+        public async Task<Category> GetCategoryByProductGroup(int productGroupId)
+        {
+            return await _context.Categories.FirstOrDefaultAsync(category => category.ProductGroupId == productGroupId);
         }
     }
 }

@@ -18,6 +18,28 @@ namespace MyAspNetApp.Controllers
             _userService = userService;
         }
 
+
+        [HttpGet]
+        public async Task<ActionResult> GetUserIdBytoken(){
+            try{
+
+                var userId = await _userService.GetUserId(HttpContext);
+
+                return Ok(new
+                {
+                    statusCode = 200,
+                    msg = "Get userId successfully",
+                    metadata = userId,
+                });
+            }catch(Exception error){
+                return BadRequest(new
+                {
+                    statusCode = 400,
+                    msg = error.Message,
+                });
+            }
+        }
+
         // API: POST api/auth
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(User user)
@@ -87,7 +109,7 @@ namespace MyAspNetApp.Controllers
 
 
         [HttpPost("resetpassword")]
-        public async Task<ActionResult> ResetPassword(UserResetPasswordDto userResetPasswordDto)
+        public async Task<ActionResult> ResetPassword([FromBody] UserResetPasswordDto userResetPasswordDto)
         {
             try{
                 var result = await _userService.ResetPassword(userResetPasswordDto);
@@ -95,6 +117,27 @@ namespace MyAspNetApp.Controllers
                 return Ok(new{
                     statusCode = 200,
                     msg = "SendMail successfully",
+                    metadata = result,
+                });
+            }catch(Exception error){
+                return BadRequest(new
+                {
+                    statusCode = 400,
+                    msg = error.Message,
+                });
+            }
+        }
+        
+
+        [HttpPost("VerifyOTP")]
+        public async Task<ActionResult> VerifyOTP(UserVerifyOTPDto userVerifyOTPDto)
+        {
+            try{
+                var result = await _userService.VevifyOTP(userVerifyOTPDto);
+
+                return Ok(new{
+                    statusCode = 200,
+                    msg = "VerifyOTP successfully",
                     metadata = result,
                 });
             }catch(Exception error){

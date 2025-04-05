@@ -11,7 +11,6 @@ namespace MyAspNetApp.Entities
 
         public List<Address> Addresses { get; set; } = new List<Address>();
         public List<Order> Orders { get; set; } = new List<Order>();
-        public List<Cart> CartItems { get; set; } = new List<Cart>();
         public ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
         public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();

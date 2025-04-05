@@ -31,7 +31,7 @@ namespace MyAspNetApp.Utils {
                         mailMessage.To.Add(toEmail);
                         mailMessage.Subject = sub;
                         mailMessage.Body = content;
-                        mailMessage.IsBodyHtml = true; // Nếu nội dung email là HTML
+                        mailMessage.IsBodyHtml = true;
 
                         await client.SendMailAsync(mailMessage);
                     }
@@ -45,7 +45,7 @@ namespace MyAspNetApp.Utils {
             catch (Exception ex)
             {
                 Console.WriteLine($"General Error: {ex.Message}");
-                throw;
+                throw new Exception("Lỗi gửi email, vui lòng kiểm tra cấu hình SMTP.");
             }
         }
 

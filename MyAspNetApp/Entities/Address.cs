@@ -9,6 +9,6 @@ namespace MyAspNetApp.Entities
         public string Country { get; set; }
         public string PostalCode { get; set; }
 
-        public User User { get; set; }
+        // public User User { get; set; }
     }
 }

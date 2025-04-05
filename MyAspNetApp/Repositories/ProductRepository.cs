@@ -1,96 +1,139 @@
-// using Microsoft.EntityFrameworkCore;
-// using MyAspNetApp.Data;
-// using MyAspNetApp.Entities;
-// using MyAspNetApp.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using MyAspNetApp.Data;
+using MyAspNetApp.Entities;
+using MyAspNetApp.Interfaces;
 
-// namespace MyAspNetApp.Repositories
-// {
-//     public class ProductRepository : IProductRepository
-//     {
-//         private readonly ApplicationDbContext _context;
+namespace MyAspNetApp.Repositories
+{
+    public class ProductRepository : IProductRepository
+    {
+        private readonly ApplicationDbContext _context;
 
-//         public ProductRepository(ApplicationDbContext context)
-//         {
-//             _context = context;
-//         }
+        public ProductRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-//         public async Task<Product> CreateProduct(Product product)
-//         {
-//             _context.Products.Add(product);
-//             await _context.SaveChangesAsync();
-//             return product;
-//         }
+        public async Task<IEnumerable<Product>> Filter(Filter filter)
+        {
 
-//         public async Task<bool> DeleteProduct(int Id)
-//         {
-//             var product = await _context.Products.FindAsync(Id);
+            var query = _context.Products
+            .Include(p => p.ProductImages)
+            .Include(p => p.Variants)
+            .AsQueryable();
 
-//             if(product != null)
-//             {
-//                 _context.Products.Remove(product);
-//                 await _context.SaveChangesAsync();
-//                 return true;
-//             }
-//             return false;
-//         }
+            if (filter.Id.HasValue)
+            {
+                query = query
+                    .Where(p => p.Id == filter.Id)
+                    .Include(p => p.Variants)
+                        .ThenInclude(v => v.Color)
+                    .Include(p => p.Variants)
+                        .ThenInclude(v => v.Size);
+            }
 
-//         public async Task<IEnumerable<Product>> GetAllProduct()
-//         {
-//             return await _context.Products.ToListAsync();
-//         }
+            if (!string.IsNullOrEmpty(filter.Gender))
+                query = query.Where(p => p.Gender == filter.Gender);
 
-//         public async Task<IEnumerable<Product>> GetProductByCategory(string categoryName)
-//         {
-//             var category = await _context.Categories.FirstOrDefaultAsync(category => category.name == categoryName);
+            if (!string.IsNullOrEmpty(filter.Name))
+                query = query.Where(p => p.Name.Contains(filter.Name));
 
-//             if(category == null)
-//             {
-//                 return null;
-//             }
+            if (filter.BrandId.HasValue)
+                query = query.Where(p => p.BrandId == filter.BrandId);
 
-//             var products = await _context.Products
-//                 .Where(p => p.CategoryId == category.Id)
-//                 .ToListAsync();
+            if (!string.IsNullOrEmpty(filter.CategoryName)){
+                var categoryId = await _context.Categories.FirstOrDefaultAsync(category => category.Name == filter.CategoryName);
+                query = query.Where(p => p.CategoryId == categoryId.Id);
+            }
 
-//             return products;
-//         }
+            if (filter.Price.HasValue)
+                query = query.Where(p => p.Price <= filter.Price);
 
-//         public async Task<Product> GetProductById(int Id)
-//         {
+            return await query.ToListAsync();
+        }
 
-//             return await _context.Products.FirstOrDefaultAsync(Product => Product.Id == Id);
-//         }
 
-//         public async Task<Product> GetProductByName(string name)
-//         {
-//             return await _context.Products.FirstOrDefaultAsync(Product => Product.name == name);
-//         }
+        public async Task<Product> CreateProduct(Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
 
-//         public async Task<Product> UpdateProduct(Product product)
-//         {
-//             var existed = await GetProductById(product.Id);
+        public async Task<bool> DeleteProduct(int Id)
+        {
+            var product = await _context.Products.FindAsync(Id);
 
-//             if(existed == null)
-//             {
-//                 return null;
-//             }
+            if(product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
 
-//             existed.name = product.name;
-//             existed.originalPrice = product.originalPrice; 
-//             existed.sellPrice = product.sellPrice; 
-//             existed.description = product.description; 
-//             existed.image_url = product.image_url; 
-//             existed.coulors = product.coulors;
-//             existed.gender = product.gender;
-//             existed.quantity = product.quantity;
-//             existed.sizes = product.sizes;
-//             existed.isAvailable = product.isAvailable; 
-//             existed.CategoryId = product.CategoryId;
+        public async Task<IEnumerable<Product>> GetAllProduct()
+        {
+            return await _context.Products
+                .Include(pg => pg.Variants)
+                .Include(pg => pg.ProductImages) 
+                .ToListAsync();
+        }
 
-//             _context.Products.Update(existed); 
+        public async Task<IEnumerable<Product>> GetProductByCategory(string categoryName)
+        {
+            var category = await _context.Categories.FirstOrDefaultAsync(category => category.Name == categoryName);
 
-//             await _context.SaveChangesAsync();
-//             return existed;
-//         }
-//     }
-// }
+            if(category == null)
+            {
+                return null;
+            }
+
+            var products = await _context.Products
+                .Where(p => p.CategoryId == category.Id)
+                .ToListAsync();
+
+            return products;
+        }
+
+        public async Task<Product> GetProductById(int Id)
+        {
+
+            return await _context.Products.FirstOrDefaultAsync(Product => Product.Id == Id);
+        }
+
+        public async Task<Product> GetProductByName(string name)
+        {
+            return await _context.Products.FirstOrDefaultAsync(Product => Product.Name == name);
+        }
+
+        public async Task<Product> UpdateProduct(Product product)
+        {
+            var existed = await GetProductById(product.Id);
+
+            if(existed == null)
+            {
+                return null;
+            }
+
+            existed.Name = product.Name;
+            existed.Price = product.Price; 
+            existed.Description = product.Description; 
+            existed.ProductImages = product.ProductImages; 
+            // existed.Colors = product.Colors;
+            existed.Gender = product.Gender;
+            existed.Stock = product.Stock;
+            // existed.Sizes = product.Sizes;
+            existed.CategoryId = product.CategoryId;
+            existed.BrandId = product.BrandId;
+            
+
+
+            _context.Products.Update(existed); 
+
+            await _context.SaveChangesAsync();
+            return existed;
+        }
+    }
+}

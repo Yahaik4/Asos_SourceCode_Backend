@@ -31,7 +31,7 @@ namespace MyAspNetApp.Controllers
                 {
                     statusCode = 200,
                     msg = "Get All Category Success",
-                    metadata =categories
+                    metadata = categories
                 });
             }catch(Exception error)
             {
@@ -66,28 +66,28 @@ namespace MyAspNetApp.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<ActionResult> UpdateCategory(Category category)
-        {
-            try
-            {
-                await _categoryService.UpdateCategory(category);
+        // [HttpPut]
+        // public async Task<ActionResult> UpdateCategory(Category category)
+        // {
+        //     try
+        //     {
+        //         await _categoryService.UpdateCategory(category);
 
-                return Ok(new
-                {
-                    statusCode = 200,
-                    msg = "Update Category Success",
-                    metadata = category
-                });
-            }catch(Exception error)
-            {
-                return BadRequest(new
-                {
-                    statusCode = 400,
-                    msg = error.Message
-                });
-            }
-        }
+        //         return Ok(new
+        //         {
+        //             statusCode = 200,
+        //             msg = "Update Category Success",
+        //             metadata = category
+        //         });
+        //     }catch(Exception error)
+        //     {
+        //         return BadRequest(new
+        //         {
+        //             statusCode = 400,
+        //             msg = error.Message
+        //         });
+        //     }
+        // }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCategory(int Id)

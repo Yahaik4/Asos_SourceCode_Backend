@@ -6,9 +6,11 @@ namespace MyAspNetApp.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
-        public CategoryService(ICategoryRepository categoryRepository)
+        private readonly IProductGroupRepository _productGroupRepository;
+        public CategoryService(ICategoryRepository categoryRepository, IProductGroupRepository productGroupRepository)
         {
             _categoryRepository = categoryRepository;
+            _productGroupRepository = productGroupRepository;
         }
 
         public async Task<Category> CreateCategory(Category category)
@@ -19,18 +21,33 @@ namespace MyAspNetApp.Services
             {
                 throw new Exception("Category already exists");
             }
+
+            var productGroup = await _productGroupRepository.GetProductGroupById(category.ProductGroupId);
+
+            if(productGroup == null){
+                throw new Exception("Product Group not exists");
+            }
+
+            var newCategory = await _categoryRepository.CreateCategory(category);
             
-            return await _categoryRepository.CreateCategory(category);
+            return newCategory;
             
         }
 
         public async Task<bool> DeleteCategory(int Id)
         {
+
             if(await _categoryRepository.DeleteCategory(Id) == false)
             {
                 throw new Exception("Category not exist");
             }
 
+            // var categoryDelete = await _categoryRepository.GetCategoryById(Id);
+
+            // var productGroup = await _productGroupRepository.GetProductGroupByName(categoryDelete.ProductGroupName);
+
+            // productGroup.Categories.Remove(categoryDelete);
+            
             return true;    
         }
 

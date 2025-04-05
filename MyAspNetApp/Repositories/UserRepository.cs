@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyAspNetApp.Data;
 using MyAspNetApp.Entities;
 using MyAspNetApp.Interfaces;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace MyAspNetApp.Repositories
 {
@@ -54,6 +57,40 @@ namespace MyAspNetApp.Repositories
             await _context.SaveChangesAsync();
             return existed;
 
+        }
+
+        private string GeneratePassword(int length = 6)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Range(0, length)
+                .Select(_ => chars[random.Next(chars.Length)]).ToArray());
+        }
+
+        private string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(password);
+                var hash = sha256.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
+        }
+
+
+        public async Task<string> ChangePassword(string email)
+        {   
+            var user = await FindUserByEmail(email);
+
+            if(user == null){
+                throw new Exception("User khong ton tai");
+            }
+
+            string password = GeneratePassword(); 
+            user.Password = HashPassword(password);
+            await UpdateUser(user);
+            
+            return password;
         }
 
     }

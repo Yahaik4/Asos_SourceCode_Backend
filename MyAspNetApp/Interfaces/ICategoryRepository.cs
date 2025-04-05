@@ -9,6 +9,7 @@ namespace MyAspNetApp.Interfaces{
         Task<Category> CreateCategory(Category category);
         Task<Category> UpdateCategory(Category category);
         Task<bool> DeleteCategory(int Id);
+        Task<Category> GetCategoryByProductGroup(int productGroupId);
     }
 
 }
