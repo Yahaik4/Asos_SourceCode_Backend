@@ -89,30 +89,30 @@ namespace MyAspNetApp.Controllers
         //     }
         // }
 
-        // [HttpDelete("{id}")]
-        // public async Task<ActionResult> DeleteCategory(int Id)
-        // {
-        //     try{
-        //         await _categoryService.DeleteCategory(Id);
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteBrand(int Id)
+        {
+            try{
+                await _brandService.DeleteBrand(Id);
 
-        //         return Ok(new
-        //         {
-        //             statusCode = 200,
-        //             msg = "Delete Category Success",
-        //             metadata = true
-        //         });
-        //     }catch(Exception error){
+                return Ok(new
+                {
+                    statusCode = 200,
+                    msg = "Delete Brand Success",
+                    metadata = true
+                });
+            }catch(Exception error){
 
 
-        //         _logger.Log($"Error fetching categories: {error.Message}");
+                _logger.Log($"Error fetching categories: {error.Message}");
                 
-        //         return BadRequest(new
-        //         {
-        //             statusCode = 400,
-        //             msg = error.Message
-        //         });
-        //     }
-        // }
+                return BadRequest(new
+                {
+                    statusCode = 400,
+                    msg = error.Message
+                });
+            }
+        }
 
     }
 }

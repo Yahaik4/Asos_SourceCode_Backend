@@ -9,7 +9,7 @@ namespace MyAspNetApp.Entities
         public int ProductGroupId { get; set; }
         // public List<ProductGroup> ProductGroups { get; set; }
 
-        public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+        // public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 
     }
 }

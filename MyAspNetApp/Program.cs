@@ -1,5 +1,7 @@
 using MyAspNetApp.Data;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
+using System.Text.Json.Serialization;
 // using Microsoft.AspNetCore.Builder;
 // using Microsoft.Extensions.DependencyInjection;
 // using Microsoft.Extensions.Hosting;
@@ -8,9 +10,15 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+StripeClientSingleton.Initialize(builder.Configuration);
 builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(); 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<CloudinaryService>();
+
+// builder.Services.AddControllers()
+//     .AddJsonOptions(x => 
+//         x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // builder.Services.AddHttpContextAccessor();
@@ -67,8 +75,17 @@ builder.Services.AddScoped<MyAspNetApp.Interfaces.ICartService, MyAspNetApp.Serv
 builder.Services.AddScoped<MyAspNetApp.Interfaces.ICartRepository, MyAspNetApp.Repositories.CartRepository>();
 builder.Services.AddScoped<MyAspNetApp.Interfaces.IWishlistService, MyAspNetApp.Services.WishlistService>();
 builder.Services.AddScoped<MyAspNetApp.Interfaces.IWishlistRepository, MyAspNetApp.Repositories.WishlistRepository>();
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IOrderService, MyAspNetApp.Services.OrderService>();
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IOrderRepository, MyAspNetApp.Repositories.OrderRepository>();
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IPaymentService, MyAspNetApp.Services.PaymentService>();
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IPaymentRepository, MyAspNetApp.Repositories.PaymentRepository>();
 
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IOrderObserver, MyAspNetApp.Services.Observers.SendEmailObserver>();
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IOrderObserver, MyAspNetApp.Services.Observers.LogObserver>();
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IOrderObserver, MyAspNetApp.Services.Observers.NotifyObserver>();
+builder.Services.AddScoped<MyAspNetApp.Interfaces.IOrderSubject, MyAspNetApp.Services.Observers.OrderSubject>();
 
+// builder.Services.AddScoped<MyAspNetApp.Interfaces.ICloudina, MyAspNetApp.Services.PaymentService>();
 
 var app = builder.Build();
 
@@ -85,5 +102,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();

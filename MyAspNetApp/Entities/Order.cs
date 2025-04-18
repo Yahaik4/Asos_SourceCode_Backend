@@ -12,5 +12,6 @@ namespace MyAspNetApp.Entities
         public User User { get; set; }
         public Address Address { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public Payment Payment { get; set; }
     }   
 }

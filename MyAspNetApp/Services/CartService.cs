@@ -65,7 +65,9 @@ namespace MyAspNetApp.Services
         //     return newCartItem;
         // }
 
-
+        public async Task<CartItem> GetCartItemById(int Id){
+            return await _cartRepository.findCartItemById(Id);
+        }
 
         public async Task<bool> DeleteCartItem(int Id)
         {

@@ -19,6 +19,7 @@ namespace MyAspNetApp.Repositories
 
             var query = _context.Products
             .Include(p => p.ProductImages)
+            .Include(p => p.Brand)
             .Include(p => p.Variants)
             .AsQueryable();
 
@@ -41,13 +42,30 @@ namespace MyAspNetApp.Repositories
             if (filter.BrandId.HasValue)
                 query = query.Where(p => p.BrandId == filter.BrandId);
 
-            if (!string.IsNullOrEmpty(filter.CategoryName)){
-                var categoryId = await _context.Categories.FirstOrDefaultAsync(category => category.Name == filter.CategoryName);
-                query = query.Where(p => p.CategoryId == categoryId.Id);
+            if (!string.IsNullOrEmpty(filter.CategoryName))
+            {
+                var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name == filter.CategoryName);
+                
+                if (category != null)
+                {
+                    query = query.Where(p => p.CategoryId == category.Id);
+                }
+                else
+                {
+                    return new List<Product>();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(filter.ProductType)){
+                var result = query.AsEnumerable()
+                    .Where(p => p.GetProductType() == filter.ProductType);
+                return result.ToList();
             }
 
             if (filter.Price.HasValue)
                 query = query.Where(p => p.Price <= filter.Price);
+
+            
 
             return await query.ToListAsync();
         }
@@ -77,7 +95,7 @@ namespace MyAspNetApp.Repositories
         {
             return await _context.Products
                 .Include(pg => pg.Variants)
-                .Include(pg => pg.ProductImages) 
+                .Include(pg => pg.ProductImages)
                 .ToListAsync();
         }
 

@@ -8,6 +8,7 @@ namespace MyAspNetApp.Entities
 
         public bool isPrimary { get; set; }
         public int DisplayOrder {get; set; }
+        
         // public virtual ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

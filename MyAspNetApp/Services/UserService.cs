@@ -28,7 +28,6 @@ namespace MyAspNetApp.Services
         {
             return await _userRepository.GetAllUser();
         }
-
         public async Task<User> CreateUser(User user)
         {
             var existed = await _userRepository.FindUserByEmail(user.Email);

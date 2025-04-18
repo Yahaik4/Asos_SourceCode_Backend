@@ -1,5 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace MyAspNetApp.Entities
 {
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "productType")]
+    [JsonDerivedType(typeof(Clothing), "Clothing")]
+    [JsonDerivedType(typeof(Shoes), "Shoes")]
+    [JsonDerivedType(typeof(Jewelry), "Jewelry")]
     public abstract class Product
     {
         public int Id { get; set; } //
@@ -15,9 +21,8 @@ namespace MyAspNetApp.Entities
         // public Category Category { get; set; } 
 
         public int BrandId { get; set; } 
-        // public Brand Brand { get; set; } 
+        public Brand Brand { get; set; } 
 
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         // public List<Cart> CartItems { get; set; } = new List<Cart>();
         // public List<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
         public List<ProductPromotion> ProductPromotions { get; set; } = new List<ProductPromotion>();

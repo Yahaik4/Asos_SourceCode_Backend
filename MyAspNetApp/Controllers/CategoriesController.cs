@@ -26,6 +26,8 @@ namespace MyAspNetApp.Controllers
         {
             try{
                 var categories = await _categoryService.GetAllCategory();
+                var service = StripeClientSingleton.Instance.PaymentIntentService;
+                Console.WriteLine($"PaymentIntentService instance: {service.GetHashCode()}");
 
                 return Ok(new
                 {

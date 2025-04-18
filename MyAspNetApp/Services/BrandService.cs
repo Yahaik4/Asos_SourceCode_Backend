@@ -31,9 +31,20 @@ namespace MyAspNetApp.Services
             return await _brandRepository.CreateBrand(brand);
         }
 
-        public Task<bool> DeleteBrand(int Id)
+        public async Task<bool> DeleteBrand(int Id)
         {
-            throw new NotImplementedException();
+            if(await _brandRepository.DeleteBrand(Id) == false)
+            {
+                throw new Exception("Category not exist");
+            }
+
+            // var categoryDelete = await _categoryRepository.GetCategoryById(Id);
+
+            // var productGroup = await _productGroupRepository.GetProductGroupByName(categoryDelete.ProductGroupName);
+
+            // productGroup.Categories.Remove(categoryDelete);
+            
+            return true; 
         }
 
         public async Task<IEnumerable<Brand>> GetAllBrand()

@@ -22,12 +22,12 @@ namespace MyAspNetApp.Repositories
             return await _context.Users.ToListAsync();
         }
 
-        public async Task<User?> FindUserByEmail(string Email)
+        public async Task<User> FindUserByEmail(string Email)
         {
             return await _context.Users.FirstOrDefaultAsync(user => user.Email == Email);
         }
 
-        public async Task<User?> FindUserById(int Id)
+        public async Task<User> FindUserById(int Id)
         {
             return await _context.Users.FirstOrDefaultAsync(user => user.Id == Id);
         }
@@ -39,7 +39,7 @@ namespace MyAspNetApp.Repositories
             return user;
         }
 
-        public async Task<User?> UpdateUser(User user)
+        public async Task<User> UpdateUser(User user)
         {
             var existed = await _context.Users.FindAsync(user.Id);
 

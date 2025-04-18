@@ -67,7 +67,7 @@ namespace MyAspNetApp.Controllers
         
 
         [HttpPost]
-        public async Task<ActionResult> CreateProduct([FromQuery] string type, ProductDto productDto)
+        public async Task<ActionResult> CreateProduct([FromQuery] string type,[FromForm] ProductDto productDto)
         {
             if (string.IsNullOrEmpty(type))
             {

@@ -10,7 +10,7 @@ namespace MyAspNetApp.Entities
         public string Role { get; set; } = "customer";
 
         public List<Address> Addresses { get; set; } = new List<Address>();
-        public List<Order> Orders { get; set; } = new List<Order>();
+        // public List<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
         public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();

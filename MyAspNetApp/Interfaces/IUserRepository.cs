@@ -6,9 +6,9 @@ namespace MyAspNetApp.Interfaces
     {
         Task<IEnumerable<User>> GetAllUser();
         Task<User> CreateUser(User user);
-        Task<User?> UpdateUser(User user);
-        Task<User?> FindUserByEmail(string Email);
-        Task<User?> FindUserById(int Id);
+        Task<User> UpdateUser(User user);
+        Task<User> FindUserByEmail(string Email);
+        Task<User> FindUserById(int Id);
 
         Task<string> ChangePassword(string email);
     }

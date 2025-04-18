@@ -15,14 +15,15 @@ namespace MyAspNetApp.Services
         private readonly IProductVariantRepository _productVariantRepository;
         private readonly IProductSizeRepository _productSizeRepository;
         private readonly IProductColorRepository _productColorRepository;
-
+        private readonly CloudinaryService _cloudinaryService;
 
         public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, 
         IProductGroupRepository productGroupRepository, IBrandRepository brandRepository,
         IProductImageRepository productImageRepository,
         IProductVariantRepository productVariantRepository,
         IProductSizeRepository productSizeRepository,
-        IProductColorRepository productColorRepository)
+        IProductColorRepository productColorRepository,
+        CloudinaryService cloudinaryService)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
@@ -32,6 +33,7 @@ namespace MyAspNetApp.Services
             _productVariantRepository = productVariantRepository;
             _productColorRepository = productColorRepository;
             _productSizeRepository = productSizeRepository;
+            _cloudinaryService = cloudinaryService;
         }
 
         // public async Task<Product> CreateProduct(string type, string name, decimal price, Dictionary<string, object> attributes)
@@ -130,17 +132,31 @@ namespace MyAspNetApp.Services
 
             if (product.ProductImages?.Any() == true)
             {
-                foreach (var img in product.ProductImages.Select((img, index) => new ProductImage
+                for (int i = 0; i < product.ProductImages.Count; i++)
                 {
-                    ProductId = newProduct.Id,
-                    ImageUrl = img.ImageUrl,
-                    isPrimary = index == 0,
-                    DisplayOrder = index + 1
-                }))
-                {
-                    await _productImageRepository.CreateProductImage(img);
+                    var file = product.ProductImages[i];
+                    
+                    string folderPath = "Asos/Products/";
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string publicId = folderPath + fileName;
+
+                    using (var stream = file.OpenReadStream())
+                    {
+                        string imageUrl = await _cloudinaryService.UploadImageAsync(stream, publicId);
+
+                        var img = new ProductImage
+                        {
+                            ProductId = newProduct.Id,
+                            ImageUrl = imageUrl,
+                            isPrimary = i == 0,
+                            DisplayOrder = i + 1
+                        };
+
+                        await _productImageRepository.CreateProductImage(img);
+                    }
                 }
             }
+
             try{
                 if (product.Variants?.Any() == true)
             {

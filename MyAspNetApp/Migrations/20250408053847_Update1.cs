@@ -6,26 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MyAspNetApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Update1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Brands",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProductGroupId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Brands", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "ProductColors",
                 columns: table => new
@@ -88,24 +73,21 @@ namespace MyAspNetApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BrandProductGroup",
+                name: "Brands",
                 columns: table => new
                 {
-                    BrandsId = table.Column<int>(type: "int", nullable: false),
-                    ProductGroupsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductGroupId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BrandProductGroup", x => new { x.BrandsId, x.ProductGroupsId });
+                    table.PrimaryKey("PK_Brands", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BrandProductGroup_Brands_BrandsId",
-                        column: x => x.BrandsId,
-                        principalTable: "Brands",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BrandProductGroup_ProductGroup_ProductGroupsId",
-                        column: x => x.ProductGroupsId,
+                        name: "FK_Brands_ProductGroup_ProductGroupId",
+                        column: x => x.ProductGroupId,
                         principalTable: "ProductGroup",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -301,6 +283,26 @@ namespace MyAspNetApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WishlistItem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WishlistId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WishlistItem", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WishlistItem_Wishlists_WishlistId",
+                        column: x => x.WishlistId,
+                        principalTable: "Wishlists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductImages",
                 columns: table => new
                 {
@@ -402,27 +404,28 @@ namespace MyAspNetApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WishlistItems",
+                name: "Payment",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    WishlistId = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    PaymentProvider = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentIntentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WishlistItems", x => x.Id);
+                    table.PrimaryKey("PK_Payment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WishlistItems_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_WishlistItems_Wishlists_WishlistId",
-                        column: x => x.WishlistId,
-                        principalTable: "Wishlists",
+                        name: "FK_Payment_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -434,7 +437,7 @@ namespace MyAspNetApp.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OrderId = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    ProductVariantId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
@@ -448,11 +451,11 @@ namespace MyAspNetApp.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderItems_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
+                        name: "FK_OrderItems_ProductVariant_ProductVariantId",
+                        column: x => x.ProductVariantId,
+                        principalTable: "ProductVariant",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -461,9 +464,9 @@ namespace MyAspNetApp.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BrandProductGroup_ProductGroupsId",
-                table: "BrandProductGroup",
-                column: "ProductGroupsId");
+                name: "IX_Brands_ProductGroupId",
+                table: "Brands",
+                column: "ProductGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CartItem_CartId",
@@ -486,9 +489,9 @@ namespace MyAspNetApp.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItems_ProductId",
+                name: "IX_OrderItems_ProductVariantId",
                 table: "OrderItems",
-                column: "ProductId");
+                column: "ProductVariantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_AddressId",
@@ -499,6 +502,12 @@ namespace MyAspNetApp.Migrations
                 name: "IX_Orders_UserId",
                 table: "Orders",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payment_OrderId",
+                table: "Payment",
+                column: "OrderId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductImages_ProductId",
@@ -546,13 +555,8 @@ namespace MyAspNetApp.Migrations
                 column: "SizeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WishlistItems_ProductId",
-                table: "WishlistItems",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WishlistItems_WishlistId",
-                table: "WishlistItems",
+                name: "IX_WishlistItem_WishlistId",
+                table: "WishlistItem",
                 column: "WishlistId");
 
             migrationBuilder.CreateIndex(
@@ -565,13 +569,13 @@ namespace MyAspNetApp.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BrandProductGroup");
-
-            migrationBuilder.DropTable(
                 name: "CartItem");
 
             migrationBuilder.DropTable(
                 name: "OrderItems");
+
+            migrationBuilder.DropTable(
+                name: "Payment");
 
             migrationBuilder.DropTable(
                 name: "ProductImages");
@@ -583,19 +587,22 @@ namespace MyAspNetApp.Migrations
                 name: "ProductTags");
 
             migrationBuilder.DropTable(
-                name: "ProductVariant");
-
-            migrationBuilder.DropTable(
-                name: "WishlistItems");
+                name: "WishlistItem");
 
             migrationBuilder.DropTable(
                 name: "Carts");
+
+            migrationBuilder.DropTable(
+                name: "ProductVariant");
 
             migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Promotions");
+
+            migrationBuilder.DropTable(
+                name: "Wishlists");
 
             migrationBuilder.DropTable(
                 name: "ProductColors");
@@ -605,9 +612,6 @@ namespace MyAspNetApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
-
-            migrationBuilder.DropTable(
-                name: "Wishlists");
 
             migrationBuilder.DropTable(
                 name: "Addresses");

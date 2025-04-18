@@ -21,9 +21,18 @@ namespace MyAspNetApp.Repositories
             return brand;
         }
 
-        public Task<bool> DeleteBrand(int Id)
+        public async Task<bool> DeleteBrand(int Id)
         {
-            throw new NotImplementedException();
+            var brand = await _context.Brands.FindAsync(Id);
+
+            if(brand != null)
+            {
+                _context.Brands.Remove(brand);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<IEnumerable<Brand>> GetAllBrand()

@@ -29,17 +29,36 @@ namespace MyAspNetApp.Data
         public DbSet<ProductVariant> ProductVariant { get; set; }
         public DbSet<CartItem> CartItem { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
-
+        public DbSet<Payment> Payments { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Product>()
+                .HasDiscriminator<string>("ProductType")
+                .HasValue<Clothing>("Clothing")
+                .HasValue<Shoes>("Shoes")
+                .HasValue<Jewelry>("Jewelry");
 
-            // Cấu hình mối quan hệ Wishlist - User
-            modelBuilder.Entity<Wishlist>()
-                .HasOne(w => w.User)
-                .WithMany(u => u.Wishlists)
-                .HasForeignKey(w => w.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // Giữ cấu hình này nếu cần thiết
+            // base.OnModelCreating(modelBuilder);
+            // modelBuilder.Entity<OrderItem>()
+            //     .HasOne(oi => oi.ProductVariant)
+            //     .WithMany()
+            //     .HasForeignKey(oi => oi.ProductVariantId)
+            //     .OnDelete(DeleteBehavior.Restrict);
+
+            // modelBuilder.Entity<Payment>()
+            //     .HasOne(p => p.Order)
+            //     .WithOne(o => o.Payment)
+            //     .HasForeignKey<Payment>(p => p.OrderId)  // OrderId là khóa ngoại
+            //     .OnDelete(DeleteBehavior.Cascade);
+
+            // // Cấu hình mối quan hệ Wishlist - User
+            // modelBuilder.Entity<Wishlist>()
+            //     .HasOne(w => w.User)
+            //     .WithMany(u => u.Wishlists)
+            //     .HasForeignKey(w => w.UserId)
+            //     .OnDelete(DeleteBehavior.Restrict); // Giữ cấu hình này nếu cần thiết
 
             // Cấu hình mối quan hệ WishlistItem - Product (Xóa mối quan hệ với Product)
             // modelBuilder.Entity<WishlistItem>()
@@ -49,11 +68,11 @@ namespace MyAspNetApp.Data
             //     .OnDelete(DeleteBehavior.Restrict); // Đảm bảo không có xóa tự động nếu tồn tại WishlistItem
 
             // Cấu hình mối quan hệ Order - User
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.User)
-                .WithMany(u => u.Orders)
-                .HasForeignKey(o => o.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // Thay Cascade bằng Restrict
+            // modelBuilder.Entity<Order>()
+            //     .HasOne(o => o.User)
+            //     .WithMany(u => u.Orders)
+            //     .HasForeignKey(o => o.UserId)
+            //     .OnDelete(DeleteBehavior.Restrict); // Thay Cascade bằng Restrict
 
             // Cấu hình mối quan hệ Order - Address
             modelBuilder.Entity<Order>()
@@ -63,11 +82,11 @@ namespace MyAspNetApp.Data
                 .OnDelete(DeleteBehavior.Restrict); // Thay Cascade bằng Restrict
 
             // Cấu hình mối quan hệ OrderItem - Order
-            modelBuilder.Entity<OrderItem>()
-                .HasOne(oi => oi.Order)
-                .WithMany(o => o.OrderItems)
-                .HasForeignKey(oi => oi.OrderId)
-                .OnDelete(DeleteBehavior.Cascade); // Giữ Cascade vì hợp lý (OrderItems phụ thuộc vào Orders)
+            // modelBuilder.Entity<OrderItem>()
+            //     .HasOne(oi => oi.Order)
+            //     .WithMany(o => o.OrderItems)
+            //     .HasForeignKey(oi => oi.OrderId)
+            //     .OnDelete(DeleteBehavior.Cascade); // Giữ Cascade vì hợp lý (OrderItems phụ thuộc vào Orders)
 
             // Cấu hình mối quan hệ Cart - User
             modelBuilder.Entity<Cart>()

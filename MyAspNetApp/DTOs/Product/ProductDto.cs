@@ -15,6 +15,6 @@ public class ProductDto
     public string? Material { get; set; }
     public string? MetalType{ get; set; }
     public string? SoleType{ get; set; }
-    public List<ProductImage> ProductImages { get; set; }
+    public List<IFormFile> ProductImages { get; set; }
     public List<ProductVariant> Variants { get; set; }
 }

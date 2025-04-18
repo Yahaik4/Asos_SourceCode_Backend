@@ -17,6 +17,7 @@ namespace MyAspNetApp.Repositories
         public async Task<IEnumerable<WishlistItem>> GetAllWishListItem(int wishlistId){
             var wishlist = await _context.Wishlists
                             .Include(w => w.WishlistItems)
+                                .ThenInclude(i => i.product)
                             .FirstOrDefaultAsync(w => w.Id == wishlistId);
             return wishlist?.WishlistItems ?? new List<WishlistItem>();
         }

@@ -22,21 +22,6 @@ namespace MyAspNetApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BrandProductGroup", b =>
-                {
-                    b.Property<int>("BrandsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductGroupsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BrandsId", "ProductGroupsId");
-
-                    b.HasIndex("ProductGroupsId");
-
-                    b.ToTable("BrandProductGroup");
-                });
-
             modelBuilder.Entity("MyAspNetApp.Entities.Address", b =>
                 {
                     b.Property<int>("Id")
@@ -91,6 +76,8 @@ namespace MyAspNetApp.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductGroupId");
 
                     b.ToTable("Brands");
                 });
@@ -213,7 +200,7 @@ namespace MyAspNetApp.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int>("ProductVariantId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -223,9 +210,57 @@ namespace MyAspNetApp.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductVariantId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("MyAspNetApp.Entities.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentProvider")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("MyAspNetApp.Entities.Product", b =>
@@ -272,8 +307,6 @@ namespace MyAspNetApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
 
@@ -572,30 +605,22 @@ namespace MyAspNetApp.Migrations
                     b.HasDiscriminator().HasValue("Shoe");
                 });
 
-            modelBuilder.Entity("BrandProductGroup", b =>
-                {
-                    b.HasOne("MyAspNetApp.Entities.Brand", null)
-                        .WithMany()
-                        .HasForeignKey("BrandsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MyAspNetApp.Entities.ProductGroup", null)
-                        .WithMany()
-                        .HasForeignKey("ProductGroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MyAspNetApp.Entities.Address", b =>
                 {
-                    b.HasOne("MyAspNetApp.Entities.User", "User")
+                    b.HasOne("MyAspNetApp.Entities.User", null)
                         .WithMany("Addresses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("User");
+            modelBuilder.Entity("MyAspNetApp.Entities.Brand", b =>
+                {
+                    b.HasOne("MyAspNetApp.Entities.ProductGroup", null)
+                        .WithMany("Brands")
+                        .HasForeignKey("ProductGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MyAspNetApp.Entities.Cart", b =>
@@ -636,9 +661,9 @@ namespace MyAspNetApp.Migrations
                         .IsRequired();
 
                     b.HasOne("MyAspNetApp.Entities.User", "User")
-                        .WithMany("Orders")
+                        .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Address");
@@ -648,36 +673,41 @@ namespace MyAspNetApp.Migrations
 
             modelBuilder.Entity("MyAspNetApp.Entities.OrderItem", b =>
                 {
-                    b.HasOne("MyAspNetApp.Entities.Order", "Order")
+                    b.HasOne("MyAspNetApp.Entities.Order", null)
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MyAspNetApp.Entities.Product", "Product")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ProductId")
+                    b.HasOne("ProductVariant", "ProductVariant")
+                        .WithMany()
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductVariant");
+                });
+
+            modelBuilder.Entity("MyAspNetApp.Entities.Payment", b =>
+                {
+                    b.HasOne("MyAspNetApp.Entities.Order", "Order")
+                        .WithOne("Payment")
+                        .HasForeignKey("MyAspNetApp.Entities.Payment", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("MyAspNetApp.Entities.Product", b =>
                 {
-                    b.HasOne("MyAspNetApp.Entities.Brand", null)
-                        .WithMany("Products")
+                    b.HasOne("MyAspNetApp.Entities.Brand", "Brand")
+                        .WithMany()
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MyAspNetApp.Entities.Category", null)
-                        .WithMany("Products")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Brand");
                 });
 
             modelBuilder.Entity("MyAspNetApp.Entities.ProductImage", b =>
@@ -731,7 +761,7 @@ namespace MyAspNetApp.Migrations
                     b.HasOne("MyAspNetApp.Entities.User", "User")
                         .WithMany("Wishlists")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -739,10 +769,10 @@ namespace MyAspNetApp.Migrations
 
             modelBuilder.Entity("MyAspNetApp.Entities.WishlistItem", b =>
                 {
-                    b.HasOne("MyAspNetApp.Entities.Product", "Product")
+                    b.HasOne("MyAspNetApp.Entities.Product", "product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MyAspNetApp.Entities.Wishlist", null)
@@ -751,39 +781,32 @@ namespace MyAspNetApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.Navigation("product");
                 });
 
             modelBuilder.Entity("ProductVariant", b =>
                 {
                     b.HasOne("MyAspNetApp.Entities.ProductColor", "Color")
-                        .WithMany("ProductVariants")
+                        .WithMany()
                         .HasForeignKey("ColorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MyAspNetApp.Entities.Product", "Product")
+                    b.HasOne("MyAspNetApp.Entities.Product", null)
                         .WithMany("Variants")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MyAspNetApp.Entities.ProductSize", "Size")
-                        .WithMany("ProductVariants")
+                        .WithMany()
                         .HasForeignKey("SizeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Color");
 
-                    b.Navigation("Product");
-
                     b.Navigation("Size");
-                });
-
-            modelBuilder.Entity("MyAspNetApp.Entities.Brand", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("MyAspNetApp.Entities.Cart", b =>
@@ -791,20 +814,16 @@ namespace MyAspNetApp.Migrations
                     b.Navigation("CartItems");
                 });
 
-            modelBuilder.Entity("MyAspNetApp.Entities.Category", b =>
-                {
-                    b.Navigation("Products");
-                });
-
             modelBuilder.Entity("MyAspNetApp.Entities.Order", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Payment")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MyAspNetApp.Entities.Product", b =>
                 {
-                    b.Navigation("OrderItems");
-
                     b.Navigation("ProductImages");
 
                     b.Navigation("ProductPromotions");
@@ -814,21 +833,13 @@ namespace MyAspNetApp.Migrations
                     b.Navigation("Variants");
                 });
 
-            modelBuilder.Entity("MyAspNetApp.Entities.ProductColor", b =>
-                {
-                    b.Navigation("ProductVariants");
-                });
-
             modelBuilder.Entity("MyAspNetApp.Entities.ProductGroup", b =>
                 {
+                    b.Navigation("Brands");
+
                     b.Navigation("Categories");
 
                     b.Navigation("ProductSize");
-                });
-
-            modelBuilder.Entity("MyAspNetApp.Entities.ProductSize", b =>
-                {
-                    b.Navigation("ProductVariants");
                 });
 
             modelBuilder.Entity("MyAspNetApp.Entities.Promotion", b =>
@@ -841,8 +852,6 @@ namespace MyAspNetApp.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("Carts");
-
-                    b.Navigation("Orders");
 
                     b.Navigation("Wishlists");
                 });

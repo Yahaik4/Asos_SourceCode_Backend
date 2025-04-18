@@ -10,5 +10,6 @@ public class Filter
     public string? Material { get; set; }
     public string? MetalType{ get; set; }
     public string? SoleType{ get; set; }
+    public string? ProductType{ get; set; }
 
 }
